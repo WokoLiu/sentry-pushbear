@@ -12,7 +12,7 @@ setup(
     url='https://github.com/WokoLiu/sentry-pushbear',
     description='A Sentry plugin that integrates with pushbear to send to wecaht',
     long_description=__doc__,
-    license='GPL',
+    license='GPL-3.0',
     packages=find_packages(),
     entry_points={
         'sentry.plugins': [

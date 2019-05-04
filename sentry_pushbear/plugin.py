@@ -67,23 +67,27 @@ class PushBearNotifications(notify.NotificationPlugin):
         link = group.get_absolute_url()
 
         culprit = group.culprit
-
+        message = event.message
         tags = event.get_tags()
 
-        message = event.message + '\n'
         if tags:
-            message = 'Tags: %s\n' % (', '.join(
-                '%s=%s' % (k, v) for (k, v) in tags))
+            tags = '\n\n'.join('%s: %s' % (k, v) for k, v in tags)
+        else:
+            tags = ''
 
         # see http://pushbear.ftqq.com/admin/#/api
         data = {
             'sendkey': self.get_option('SendKey', project),
             'text': title,
-            'desp': ('### culprit\n'
+            'desp': ('## Project\n'
                      '%s\n'
-                     '### message\n'
-                     '[%s](%s)'
-                     % (culprit, message, link)),
+                     '## Culprit\n'
+                     '%s\n'
+                     '## Message\n'
+                     '[%s](%s)\n'
+                     '## Tags\n'
+                     '%s'
+                     % (project.name, culprit, message, link, tags)),
         }
 
         rv = safe_urlopen(method='POST',
