@@ -59,7 +59,7 @@ class PushBearNotifications(notify.NotificationPlugin):
             }
         ]
 
-    def notify_users(self, group, event, triggering_rules, fail_silently=False, **kwargs):
+    def notify_users(self, group, event, fail_silently=False, **kwargs):
         self.logger.debug('Received notification for event: %s' % event)
         project = group.project
 

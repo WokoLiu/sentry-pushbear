@@ -14,9 +14,6 @@ setup(
     long_description=__doc__,
     license='GPL',
     packages=find_packages(),
-    install_requires=[
-        'sentry>=7.1.0',
-    ],
     entry_points={
         'sentry.plugins': [
             'sentry_pushbear = sentry_pushbear.plugin:PushBearNotifications'
