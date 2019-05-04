@@ -12,14 +12,14 @@ setup(
     url='https://github.com/WokoLiu/sentry-pushbear',
     description='A Sentry plugin that integrates with pushbear to send to wecaht',
     long_description=__doc__,
-    license='BSD',
+    license='GPL',
     packages=find_packages(),
     install_requires=[
         'sentry>=7.1.0',
     ],
     entry_points={
         'sentry.plugins': [
-            'pushbear = sentry_pushbear.plugin:PushBearNotifications'
+            'sentry_pushbear = sentry_pushbear.plugin:PushBearNotifications'
         ]
     },
     include_package_data=True,

@@ -4,28 +4,31 @@
 """
 Sentry-PushBear
 """
+import logging
 
 from django import forms
 from sentry.http import safe_urlopen
-from sentry.plugins.bases.notify import NotifyPlugin
+from sentry.plugins.bases import notify
 
 import sentry_pushbear
 
 
-class PushBearSettingsForm(forms.Form):
+class PushBearSettingsForm(notify.NotificationConfigurationForm):
     SendKey = forms.CharField(
-        help_text='Your SendKey. See http://pushbear.ftqq.com/')
+        label='PushBear SendKey',
+        widget=forms.TextInput(attrs={'placeholder': '12000-00000000000000000000000000000000'}),
+        help_text='Your SendKey. See http://pushbear.ftqq.com/'
+    )
 
 
-class PushBearNotifications(NotifyPlugin):
+class PushBearNotifications(notify.NotificationPlugin):
+    title = 'PushBear Notifications'
+    slug = 'sentry_pushbear'
     author = 'Woko'
-    author_url = 'https://github.com/WokoLiu'
+    author_url = 'https://github.com/WokoLiu/sentry-pushbear'
 
-    title = 'PushBear'
-
-    conf_title = 'PushBear'
-    conf_key = 'pushbear'
-    slug = 'pushbear'
+    conf_title = title
+    conf_key = 'sentry_pushbear'
 
     resource_links = [
         ('Bug Tracker', 'https://github.com/WokoLiu/sentry-pushbear/issues'),
@@ -35,15 +38,29 @@ class PushBearNotifications(NotifyPlugin):
     version = sentry_pushbear.VERSION
     project_conf_form = PushBearSettingsForm
 
+    logger = logging.getLogger('sentry.plugins.sentry_pushbear')
+
     def can_enable_for_projects(self):
         return True
 
-    def is_configured(self, project):
+    def is_configured(self, project, **kwargs):
         return bool(self.get_option('SendKey', project))
 
-    def notify(self, notification):
-        event = notification.event
-        group = event.group
+    def get_config(self, project, **kwargs):
+        return [
+            {
+                'name': 'SendKey',
+                'label': 'PushBear SendKey',
+                'type': 'text',
+                'help': 'Your SendKe. See http://pushbear.ftqq.com/',
+                'placeholder': '12000-00000000000000000000000000000000',
+                'validators': [],
+                'required': True,
+            }
+        ]
+
+    def notify_users(self, group, event, triggering_rules, fail_silently=False, **kwargs):
+        self.logger.debug('Received notification for event: %s' % event)
         project = group.project
 
         title = '%s: %s' % (project.name, group.title)
@@ -69,14 +86,8 @@ class PushBearNotifications(NotifyPlugin):
                      % (culprit, message, link)),
         }
 
-        rv = safe_urlopen('https://pushbear.ftqq.com/sub',
+        rv = safe_urlopen(method='POST',
+                          url='https://pushbear.ftqq.com/sub',
                           data=data)
         if not rv.ok:
             raise RuntimeError('Failed to notify: %s' % rv)
-
-            # try:
-            #     res = rv.json()
-            #     if res['code'] != 0:
-            #         raise RuntimeError('Failed to notify: %s' % res['message'])
-            # except (AttributeError, KeyError) as e:
-            #     raise RuntimeError('Failed to notify: %s' % e)
