@@ -52,7 +52,7 @@ class PushBearNotifications(notify.NotificationPlugin):
                 'name': 'SendKey',
                 'label': 'PushBear SendKey',
                 'type': 'text',
-                'help': 'Your SendKe. See http://pushbear.ftqq.com/',
+                'help': 'Your SendKey. See http://pushbear.ftqq.com/',
                 'placeholder': '12000-00000000000000000000000000000000',
                 'validators': [],
                 'required': True,
